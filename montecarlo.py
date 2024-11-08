@@ -51,7 +51,7 @@ if start_date >= end_date:
     st.stop()
 
 # Ticker input and validation
-default_tickers = imported_config["tickers"] if config_option == "Import Existing" and imported_config else "AAPL, MSFT, GOOGL"
+default_tickers = imported_config["tickers"] if config_option == "Import Existing" and imported_config else "VOO, VGT, FBND"
 tickers_input = st.sidebar.text_input("Enter the tickers (comma-separated)", default_tickers)
 tickers = [tick.strip() for tick in tickers_input.split(",") if tick.strip()]
 
