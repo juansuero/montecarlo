@@ -44,7 +44,7 @@ st.sidebar.header("User Input Parameters")
 # Date Range Selection
 st.sidebar.subheader("Historical Data Range")
 end_date = st.sidebar.date_input("End Date", datetime.today())
-start_date = st.sidebar.date_input("Start Date", end_date - timedelta(days=3650))  # Default to ~10 years
+start_date = st.sidebar.date_input("Start Date", end_date - timedelta(days=1825))  # Default to ~10 years
 
 if start_date >= end_date:
     st.error("Start date must be before end date")
