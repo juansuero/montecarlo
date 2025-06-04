@@ -6,6 +6,7 @@ This project is a Monte Carlo simulator for portfolio value predictions using hi
 - Run simulations using custom stock tickers and weights.
 - Analyze portfolio performance with risk metrics and visualizations.
 - Export simulation results to graphs and files.
+- Download final values and sample paths as CSV.
 
 ## Installation
 1. Clone this repository:
