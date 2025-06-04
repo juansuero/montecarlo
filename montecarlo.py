@@ -8,6 +8,23 @@ from datetime import datetime, timedelta
 import json
 import base64
 
+@st.cache_data(show_spinner=False)
+def fetch_data(tickers, start_date, end_date):
+    """Download historical data and cache the result."""
+    data = yf.download(tickers, start=start_date, end=end_date, group_by="column")
+
+    if 'Adj Close' in data.columns:
+        data = data['Adj Close']
+    elif 'Close' in data.columns:
+        data = data['Close']
+    else:
+        raise KeyError("Neither 'Adj Close' nor 'Close' data available")
+
+    if isinstance(data, pd.Series):
+        data = data.to_frame(tickers[0])
+
+    return data
+
 # Streamlit App Configuration
 st.title("Monte Carlo Portfolio Simulator")
 
@@ -146,22 +163,16 @@ st.sidebar.text_area("Configuration String (Copy to share)", config_string, heig
 
 # Step 2: Download Historical Data with Error Handling
 st.write(f"Fetching historical data for {tickers}...")
+
+# Invalidate the cached data if parameters change
+cache_key = (tuple(tickers), start_date, end_date)
+if st.session_state.get("data_cache_key") != cache_key:
+    fetch_data.clear()
+    st.session_state["data_cache_key"] = cache_key
+
 try:
-    data = yf.download(tickers, start=start_date, end=end_date, group_by="column")
+    data = fetch_data(tickers, start_date, end_date)
 
-    # yfinance may return either 'Adj Close' or only 'Close'.
-    if 'Adj Close' in data.columns:
-        data = data['Adj Close']
-    elif 'Close' in data.columns:
-        data = data['Close']
-    else:
-        raise KeyError("Neither 'Adj Close' nor 'Close' data available")
-
-    # yf.download returns a Series when only one ticker is provided. Convert it
-    # to a DataFrame so downstream operations work consistently.
-    if isinstance(data, pd.Series):
-        data = data.to_frame(tickers[0])
-    
     if data.empty:
         st.error("No data retrieved. Please check if the ticker symbols are correct.")
         st.stop()
