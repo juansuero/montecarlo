@@ -147,7 +147,15 @@ st.sidebar.text_area("Configuration String (Copy to share)", config_string, heig
 # Step 2: Download Historical Data with Error Handling
 st.write(f"Fetching historical data for {tickers}...")
 try:
-    data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
+    data = yf.download(tickers, start=start_date, end=end_date, group_by="column")
+
+    # yfinance may return either 'Adj Close' or only 'Close'.
+    if 'Adj Close' in data.columns:
+        data = data['Adj Close']
+    elif 'Close' in data.columns:
+        data = data['Close']
+    else:
+        raise KeyError("Neither 'Adj Close' nor 'Close' data available")
 
     # yf.download returns a Series when only one ticker is provided. Convert it
     # to a DataFrame so downstream operations work consistently.
