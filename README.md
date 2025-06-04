@@ -21,3 +21,4 @@ This project is a Monte Carlo simulator for portfolio value predictions using hi
 ## Usage
 ```bash
 streamlit run montecarlo.py
+```

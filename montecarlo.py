@@ -148,6 +148,11 @@ st.sidebar.text_area("Configuration String (Copy to share)", config_string, heig
 st.write(f"Fetching historical data for {tickers}...")
 try:
     data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
+
+    # yf.download returns a Series when only one ticker is provided. Convert it
+    # to a DataFrame so downstream operations work consistently.
+    if isinstance(data, pd.Series):
+        data = data.to_frame(tickers[0])
     
     if data.empty:
         st.error("No data retrieved. Please check if the ticker symbols are correct.")
