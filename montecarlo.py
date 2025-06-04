@@ -286,6 +286,21 @@ try:
     st.pyplot(fig)
     plt.close()
 
+    # Allow users to download simulation results as CSV
+    st.subheader("Export Results")
+    download_df = pd.DataFrame(
+        simulation_results,
+        columns=[f"Step_{i+1}" for i in range(time_horizon)]
+    )
+    download_df.insert(0, "Final Value", final_values)
+    csv_data = download_df.to_csv(index=False)
+    st.download_button(
+        label="Download CSV",
+        data=csv_data,
+        file_name="simulation_results.csv",
+        mime="text/csv"
+    )
+
 except Exception as e:
     st.error(f"Error during simulation: {e}")
     st.stop()
