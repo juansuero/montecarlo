@@ -217,6 +217,14 @@ try:
 
     # Step 6: Display Results
     final_values = simulation_results[:, -1]
+
+    # Risk Metrics
+    final_returns = final_values / initial_value - 1
+    var_5 = np.percentile(final_returns, 5)
+    cvar_5 = final_returns[final_returns <= var_5].mean()
+    portfolio_mean = np.dot(weights, mean_returns)
+    portfolio_std = np.sqrt(np.dot(weights, np.dot(cov_matrix, weights)))
+    sharpe_ratio = (portfolio_mean / portfolio_std) * np.sqrt(252)
     
     # Create two columns for statistics
     col1, col2 = st.columns(2)
@@ -228,6 +236,11 @@ try:
         st.write(f"Standard Deviation: ${np.std(final_values):,.2f}")
         st.write(f"Minimum Value: ${np.min(final_values):,.2f}")
         st.write(f"Maximum Value: ${np.max(final_values):,.2f}")
+
+        st.subheader("Risk Metrics")
+        st.write(f"5% Value at Risk (VaR): {var_5*100:.2f}%")
+        st.write(f"5% Conditional VaR (CVaR): {cvar_5*100:.2f}%")
+        st.write(f"Sharpe Ratio: {sharpe_ratio:.2f}")
 
     with col2:
         st.subheader("Percentile Analysis")
