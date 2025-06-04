@@ -7,6 +7,7 @@ import streamlit as st
 from datetime import datetime, timedelta
 import json
 import base64
+import requests
 
 # Streamlit App Configuration
 st.title("Monte Carlo Portfolio Simulator")
@@ -147,6 +148,14 @@ st.sidebar.text_area("Configuration String (Copy to share)", config_string, heig
 # Step 2: Download Historical Data with Error Handling
 st.write(f"Fetching historical data for {tickers}...")
 try:
+    # Validate tickers individually to catch invalid symbols
+    for t in tickers:
+        try:
+            yf.Ticker(t).history(period="1d")
+        except Exception as ticker_err:
+            st.error(f"Ticker '{t}' appears invalid or data is not available: {ticker_err}")
+            st.stop()
+
     data = yf.download(tickers, start=start_date, end=end_date, group_by="column")
 
     # yfinance may return either 'Adj Close' or only 'Close'.
@@ -174,7 +183,13 @@ try:
     st.write("Data fetched successfully!")
     
 except Exception as e:
-    st.error(f"Error downloading data: {e}")
+    if isinstance(e, requests.exceptions.RequestException):
+        st.error(
+            "Network request failed while downloading data. "
+            "Please check your internet connection and try again."
+        )
+    else:
+        st.error(f"Error downloading data: {e}")
     st.stop()
 
 # Step 3: Calculate Daily Returns
